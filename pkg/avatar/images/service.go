@@ -46,7 +46,7 @@ func (avatar *Avatar) buildGrid(encodedInformation []byte) []byte {
 }
 
 //metodo para encontrar los valores pares del hash a rellenar
-func (avatar *Avatar) findOddBoxes([]GridPoint) []GridPoint {
+func (avatar *Avatar) findOddBoxes(Avatar) []GridPoint {
 	grid := []GridPoint{}
 	for i, code := range avatar.grid {
 		if code%2 == 0 {
@@ -59,4 +59,25 @@ func (avatar *Avatar) findOddBoxes([]GridPoint) []GridPoint {
 	}
 	avatar.gridPoints = grid
 	return avatar.gridPoints
+}
+
+//metodo para obtener las coordenadas de cada valor par
+func (avatar *Avatar) buildPixelMap(Avatar) []DrawingPoints {
+	drawingPoints := []DrawingPoints{}
+	pixelFunc := func(p GridPoint) DrawingPoints {
+		horizontal := (p.index % 5) * 50
+		vertical := (p.index / 5) * 50
+		topLeft := Point{horizontal, vertical}
+		bottomRight := Point{horizontal + 50, vertical + 50}
+
+		return DrawingPoints{
+			topLeft,
+			bottomRight,
+		}
+	}
+	for _, gridPoint := range avatar.gridPoints {
+		drawingPoints = append(drawingPoints, pixelFunc(gridPoint))
+	}
+	avatar.pixelMap = drawingPoints
+	return avatar.pixelMap
 }
