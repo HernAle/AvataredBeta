@@ -1,7 +1,15 @@
 package images
 
+import (
+	"image"
+	"image/color"
+	"image/png"
+	"os"
+)
+
 //estructura principal del avatar
 type Avatar struct {
+	hash       []byte
 	color      [3]byte
 	grid       []byte
 	gridPoints []GridPoint
@@ -24,19 +32,19 @@ type Point struct {
 }
 
 //metodo para la obtencion del color del avatar mediante los 3 primeros valores del hash
-func (avatar *Avatar) getColor(encodedInformation []byte) [3]byte {
+func (avatar *Avatar) getColor(Avatar) [3]byte {
 	rgb := [3]byte{}
-	copy(rgb[:], encodedInformation[0:3])
+	copy(rgb[:], avatar.hash[0:3])
 	avatar.color = rgb
 	return avatar.color
 }
 
 //metodo para crear un avatar simetrico, las dos primeras columna se reflejan en las dos ultimas
-func (avatar *Avatar) buildGrid(encodedInformation []byte) []byte {
+func (avatar *Avatar) buildGrid(Avatar) []byte {
 	grid := []byte{}
-	for i := 0; i < len(encodedInformation) && i+3 <= len(encodedInformation)-1; i += 3 {
+	for i := 0; i < len(avatar.hash) && i+3 <= len(avatar.hash)-1; i += 3 {
 		box := make([]byte, 5)
-		copy(box[:], encodedInformation[i:i+3])
+		copy(box[:], avatar.hash[i:i+3])
 		box[3] = box[1]
 		box[4] = box[2]
 		grid = append(grid, box...)
@@ -80,4 +88,37 @@ func (avatar *Avatar) buildPixelMap(Avatar) []DrawingPoints {
 	}
 	avatar.pixelMap = drawingPoints
 	return avatar.pixelMap
+}
+
+//metodo para construccion de avatar
+func (avatar *Avatar) buildImage(Avatar) error {
+	img := image.NewRGBA(image.Rect(0, 0, 250, 250))
+	col := color.RGBA{avatar.color[0], avatar.color[1], avatar.color[2], 255}
+	for _, pixel := range avatar.pixelMap {
+		for x := pixel.topLeft.x; x < pixel.bottomRight.x; x++ {
+			for y := pixel.topLeft.y; y < pixel.bottomRight.y; y++ {
+				img.Set(x, y, col)
+			}
+		}
+	}
+	f, _ := os.Create("your-avatar.png")
+	return png.Encode(f, img)
+}
+
+func (avatar *Avatar) BuildAndSaveImage(encodedInformation []byte) error {
+	localHash := &Avatar{
+		hash: encodedInformation,
+	}
+	avatar.getColor(*localHash)
+	avatar.buildGrid(*localHash)
+	avatar.findOddBoxes(Avatar{
+		grid: avatar.grid,
+	})
+	avatar.buildPixelMap(Avatar{
+		gridPoints: avatar.gridPoints,
+	})
+	avatar.buildImage(Avatar{
+		pixelMap: avatar.pixelMap,
+	})
+	return nil
 }
