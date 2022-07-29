@@ -3,10 +3,13 @@ package main
 import (
 	"github.com/HernAle/AvataredBeta/pkg/avatar"
 	"github.com/HernAle/AvataredBeta/pkg/avatar/encoder"
+	"github.com/HernAle/AvataredBeta/pkg/avatar/images"
 )
 
 func main() {
 	enc := encoder.NewMD5Encoder()
+	imgGen := images.NewAvatar()
 
-	avatar.NewService(enc)
+	avt := avatar.NewService(enc, imgGen)
+	avt.GenerateAndSaveAvatar("juan3@gmail.com")
 }
