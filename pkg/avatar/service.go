@@ -1,26 +1,37 @@
 package avatar
 
-//Encode information from any personal data
+//infoEncoder encode and normalize information from any personal data
 type infoEncoder interface {
 	EncodeInformation(userInformation string) (encodedInformation []byte, err error)
 }
 
-//Transform encode information to avatar
+//imageGenerator create a single avatar with encoded information
 type imageGenerator interface {
 	BuildAndSaveImage(encodedInformation []byte) error
 }
 
-//Build funcionalities between interfaces
+//Service has both dependencies
 type Service struct {
 	encoder   infoEncoder
 	generator imageGenerator
 }
 
-type Information struct {
-	//Here go all the information that you want to encode could be eMail string
+func NewService(e infoEncoder, g imageGenerator) *Service {
+	return &Service{
+		encoder:   e,
+		generator: g,
+	}
 }
 
-func (s *Service) GenerateAndSaveAvatar(information Information) error {
+func (s *Service) GenerateAndSaveAvatar(email string) error {
 	//Here will be all  logic
+	encodedEmail, err := s.encoder.EncodeInformation(email)
+	if err != nil {
+		panic(err)
+	}
+	genErr := s.generator.BuildAndSaveImage(encodedEmail)
+	if genErr != nil {
+		panic(genErr)
+	}
 	return nil
 }

@@ -11,5 +11,5 @@ func main() {
 	imgGen := images.NewAvatar()
 
 	avt := avatar.NewService(enc, imgGen)
-	avt.GenerateAndSaveAvatar("juan3@gmail.com")
+	avt.GenerateAndSaveAvatar("lara@gmail.com")
 }

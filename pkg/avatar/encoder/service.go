@@ -10,3 +10,7 @@ func (*MD5Encoder) EncodeInformation(userInformation string) (encodedInformation
 	avatarMD5 := md5.Sum([]byte(userInformation))
 	return avatarMD5[:], nil
 }
+
+func NewMD5Encoder() *MD5Encoder {
+	return &MD5Encoder{}
+}
