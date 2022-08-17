@@ -6,5 +6,5 @@ import (
 
 func main() {
 	avt := avatar.NewService()
-	avt.GenerateAndSaveAvatar("anybody@email.com")
+	avt.GenerateAndSaveAvatar("somebody@email.com")
 }

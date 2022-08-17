@@ -1,37 +1,45 @@
 package avatar
 
-//infoEncoder encode and normalize information from any personal data
-type infoEncoder interface {
+import (
+	"errors"
+	"fmt"
+
+	"github.com/HernAle/AvataredBeta/pkg/avatar/encoder"
+	"github.com/HernAle/AvataredBeta/pkg/avatar/images"
+)
+
+//dataEncoder encode and normalize information from any personal data
+type dataEncoder interface {
 	EncodeInformation(userInformation string) (encodedInformation []byte, err error)
 }
 
-//imageGenerator create a single avatar with encoded information
-type imageGenerator interface {
+//avatarGenerator create a single avatar with encoded information
+type avatarGenerator interface {
 	BuildAndSaveImage(encodedInformation []byte) error
 }
 
-//Service has both dependencies
+//Service list both dependencies
 type Service struct {
-	encoder   infoEncoder
-	generator imageGenerator
+	encoder   dataEncoder
+	generator avatarGenerator
 }
 
-func NewService(e infoEncoder, g imageGenerator) *Service {
-	return &Service{
-		encoder:   e,
-		generator: g,
-	}
-}
-
-func (s *Service) GenerateAndSaveAvatar(email string) error {
-	//Here will be all  logic
-	encodedEmail, err := s.encoder.EncodeInformation(email)
+//GenerateAndSaveAvatar joins both dependencies to give full functionality
+func (service *Service) GenerateAndSaveAvatar(userData string) error {
+	encodedData, err := service.encoder.EncodeInformation(userData)
 	if err != nil {
-		panic(err)
+		return errors.New(fmt.Sprintf("an error ocurred trying to encode the data"))
 	}
-	genErr := s.generator.BuildAndSaveImage(encodedEmail)
+	genErr := service.generator.BuildAndSaveImage(encodedData)
 	if genErr != nil {
-		panic(genErr)
+		return errors.New(fmt.Sprintf("an error ocurred trying to build and save image"))
 	}
 	return nil
+}
+
+func NewService() *Service {
+	return &Service{
+		encoder:   encoder.NewMD5Encoder(),
+		generator: images.NewAvatar(),
+	}
 }

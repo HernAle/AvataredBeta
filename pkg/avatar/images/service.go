@@ -46,7 +46,7 @@ func (avatar *Avatar) buildGrid() []byte {
 		box := make([]byte, 5)
 		copy(box[:], avatar.hash[i:i+3])
 		box[3] = box[1]
-		box[4] = box[2]
+		box[4] = box[0]
 		grid = append(grid, box...)
 	}
 	avatar.grid = grid
